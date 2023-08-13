@@ -22,7 +22,12 @@ class _AuthStreamState extends State<AuthStream> {
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.active) {
-              return Center(child: CircularProgressIndicator());
+              return Scaffold(
+                  backgroundColor: const Color.fromARGB(255, 215, 255, 246),
+                  body: Center(
+                      child: CircularProgressIndicator(
+                    color: Colors.black,
+                  )));
             }
             final user = snapshot.data;
             if (user != null) {
@@ -32,7 +37,9 @@ class _AuthStreamState extends State<AuthStream> {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => HomePage()));
               });
-              return Container();
+              return Container(
+                color: Colors.amberAccent,
+              );
             } else {
               print("user is not logged in");
               SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -40,7 +47,9 @@ class _AuthStreamState extends State<AuthStream> {
                     MaterialPageRoute(builder: (context) => LoginPage()));
               });
 
-              return Container();
+              return Container(
+                color: Colors.amberAccent,
+              );
             }
           }),
     );

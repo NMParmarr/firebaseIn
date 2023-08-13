@@ -73,9 +73,12 @@ class _HomePageState extends State<HomePage> {
             ),
           );
         }
-        return Center(
-          child: CircularProgressIndicator(),
-        );
+        return Scaffold(
+            backgroundColor: Color.fromARGB(255, 153, 255, 233),
+            body: Center(
+                child: CircularProgressIndicator(
+              color: Colors.black,
+            )));
       },
     );
   }
