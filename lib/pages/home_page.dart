@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () => provider.signOut(context),
                       child: provider.loading
                           ? CircularProgressIndicator(
-                              color: Colors.white,
+                              color: const Color.fromARGB(255, 0, 0, 0),
                             )
                           : Text("Sign Out"),
                     )

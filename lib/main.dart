@@ -7,11 +7,12 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider<LoadingProvider>(create: (_) => LoadingProvider())
-    ],
-    child: const MyApp()));
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider<LoadingProvider>(create: (_) => LoadingProvider()),
+    ChangeNotifierProvider<LoginProvider>(create: (_) => LoginProvider()),
+    ChangeNotifierProvider<PasswordVisibilityProvider>(
+        create: (_) => PasswordVisibilityProvider())
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {

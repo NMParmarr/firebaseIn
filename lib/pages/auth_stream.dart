@@ -49,6 +49,10 @@ class _AuthStreamState extends State<AuthStream> {
 
               return Container(
                 color: Colors.amberAccent,
+                child: Center(
+                    child: CircularProgressIndicator(
+                  color: Colors.black,
+                )),
               );
             }
           }),
