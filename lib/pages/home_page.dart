@@ -46,30 +46,35 @@ class _HomePageState extends State<HomePage> {
         if (snapshot.connectionState == ConnectionState.done) {
           Map<String, dynamic> data =
               snapshot.data!.data() as Map<String, dynamic>;
-          return Scaffold(
-            appBar: AppBar(
-              title: Text("User Profile : ${data['username']}"),
-              centerTitle: true,
-              automaticallyImplyLeading: false,
-            ),
-            body: Center(
-              child: Consumer<LoadingProvider>(
-                  builder: (context, provider, child) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Welcome : ${data['username']}'),
-                    ElevatedButton(
-                      onPressed: () => provider.signOut(context),
-                      child: provider.loading
-                          ? CircularProgressIndicator(
-                              color: const Color.fromARGB(255, 0, 0, 0),
-                            )
-                          : Text("Sign Out"),
-                    )
-                  ],
-                );
-              }),
+          return WillPopScope(
+            onWillPop: () async {
+              return FirebaseAuth.instance.currentUser != null;
+            },
+            child: Scaffold(
+              appBar: AppBar(
+                title: Text("User Profile : ${data['username']}"),
+                centerTitle: true,
+                automaticallyImplyLeading: false,
+              ),
+              body: Center(
+                child: Consumer<LoadingProvider>(
+                    builder: (context, provider, child) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Welcome : ${data['username']}'),
+                      ElevatedButton(
+                        onPressed: () => provider.signOut(context),
+                        child: provider.loading
+                            ? CircularProgressIndicator(
+                                color: const Color.fromARGB(255, 0, 0, 0),
+                              )
+                            : Text("Sign Out"),
+                      )
+                    ],
+                  );
+                }),
+              ),
             ),
           );
         }

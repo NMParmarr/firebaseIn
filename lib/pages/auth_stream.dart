@@ -34,17 +34,25 @@ class _AuthStreamState extends State<AuthStream> {
               print("user is logged in");
               print(user);
               SchedulerBinding.instance.addPostFrameCallback((_) {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => HomePage()));
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                );
               });
               return Container(
                 color: Colors.amberAccent,
+                child: Center(
+                    child: CircularProgressIndicator(
+                  color: Colors.black,
+                )),
               );
             } else {
               print("user is not logged in");
               SchedulerBinding.instance.addPostFrameCallback((_) {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => LoginPage()));
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
               });
 
               return Container(

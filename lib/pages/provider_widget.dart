@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_in/pages/auth_stream.dart';
 import 'package:firebase_in/pages/login_page.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,8 @@ class LoadingProvider extends ChangeNotifier {
     notifyListeners();
     try {
       _auth.signOut().whenComplete(() {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: ((context) => AuthStream())));
         loading = false;
         notifyListeners();
       });
@@ -25,9 +28,13 @@ class LoadingProvider extends ChangeNotifier {
 }
 
 class LoginProvider extends ChangeNotifier {
+  // late bool navigate;
   final _auth = FirebaseAuth.instance;
   bool loading = false;
+
   Future<void> login(BuildContext context, email, password) async {
+    bool navigate = true;
+    print("Navigate1 $navigate");
     loading = true;
     notifyListeners();
     try {
@@ -35,13 +42,22 @@ class LoginProvider extends ChangeNotifier {
           .signInWithEmailAndPassword(email: email, password: password)
           .whenComplete(() {
         loading = false;
+
         notifyListeners();
       });
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(e.toString())));
       loading = false;
+      navigate = false;
       notifyListeners();
+      print("Navigate2 $navigate");
+    }
+    print("Navigate3 $navigate");
+
+    if (navigate) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: ((context) => AuthStream())));
     }
   }
 
