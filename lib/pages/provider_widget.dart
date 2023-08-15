@@ -34,7 +34,6 @@ class LoginProvider extends ChangeNotifier {
 
   Future<void> login(BuildContext context, email, password) async {
     bool navigate = true;
-    print("Navigate1 $navigate");
     loading = true;
     notifyListeners();
     try {
@@ -51,9 +50,7 @@ class LoginProvider extends ChangeNotifier {
       loading = false;
       navigate = false;
       notifyListeners();
-      print("Navigate2 $navigate");
     }
-    print("Navigate3 $navigate");
 
     if (navigate) {
       Navigator.pushReplacement(
@@ -61,7 +58,9 @@ class LoginProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> signUp(BuildContext context, uname, email, password) async {
+  Future<void> signUp(BuildContext context, uname, email, password, mobile) async {
+    bool navigate = true;
+
     loading = true;
     try {
       loading = true;
@@ -72,16 +71,21 @@ class LoginProvider extends ChangeNotifier {
         loading = false;
         notifyListeners();
       });
-      addUser(uname, email, password);
+      addUser(uname, email, password, mobile);
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(e.toString())));
       loading = false;
+      navigate = false;
       notifyListeners();
+    }
+    if (navigate) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: ((context) => AuthStream())));
     }
   }
 
-  Future<void> addUser(uname, email, password) async {
+  Future<void> addUser(uname, email, password,mobile) async {
     try {
       FirebaseFirestore _firestore = FirebaseFirestore.instance;
       CollectionReference users = _firestore.collection("users");
@@ -91,6 +95,7 @@ class LoginProvider extends ChangeNotifier {
           "email": email,
           "password": password,
           "username": uname,
+          "mobile" :mobile
         },
       ).then((value) {
         LoginPage().isLogin = !LoginPage().isLogin;

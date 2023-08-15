@@ -50,19 +50,20 @@ class _HomePageState extends State<HomePage> {
             onWillPop: () async {
               return FirebaseAuth.instance.currentUser != null;
             },
-            child: Scaffold(
-              appBar: AppBar(
-                title: Text("User Profile : ${data['username']}"),
-                centerTitle: true,
-                automaticallyImplyLeading: false,
-              ),
-              body: Center(
-                child: Consumer<LoadingProvider>(
-                    builder: (context, provider, child) {
-                  return Column(
+            child:
+                Consumer<LoadingProvider>(builder: (context, provider, child) {
+              return Scaffold(
+                appBar: AppBar(
+                  title: Text("User Profile : ${data['username']}"),
+                  centerTitle: true,
+                  automaticallyImplyLeading: false,
+                ),
+                body: Center(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('Welcome : ${data['username']}'),
+                      Text("Mobile : ${data['mobile']}"),
                       ElevatedButton(
                         onPressed: () => provider.signOut(context),
                         child: provider.loading
@@ -72,10 +73,10 @@ class _HomePageState extends State<HomePage> {
                             : Text("Sign Out"),
                       )
                     ],
-                  );
-                }),
-              ),
-            ),
+                  ),
+                ),
+              );
+            }),
           );
         }
         return Scaffold(

@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_in/pages/login_with_phone.dart';
 import 'package:firebase_in/pages/provider_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,11 +19,13 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _unamecontroller = TextEditingController();
   final _emailcontroller = TextEditingController();
+  final _mobileController = TextEditingController();
   final _passcontroller = TextEditingController();
 
   String uname = '';
   String email = '';
   String password = '';
+  String mobile = '';
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     SizedBox.shrink(),
                     Container(
-                      height: 380,
+                      height: 300,
                       width: double.infinity,
                       decoration: BoxDecoration(
                           image: DecorationImage(
@@ -93,6 +96,24 @@ class _LoginPageState extends State<LoginPage> {
                               borderRadius: BorderRadius.circular(3))),
                     ),
                     SizedBox(height: 20),
+                    widget.isLogin
+                        ? SizedBox()
+                        : TextFormField(
+                            validator: (mobile) {
+                              if (mobile!.isEmpty)
+                                return "Mobile no is required..";
+                              else if (mobile.length > 10 || mobile.length < 10)
+                                return "Enter valid mobile no..";
+                              else
+                                return null;
+                            },
+                            controller: _mobileController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                                hintText: "Mobile No.",
+                                border: UnderlineInputBorder(
+                                    borderRadius: BorderRadius.circular(3)))),
+                    SizedBox(height: 20),
                     Consumer<PasswordVisibilityProvider>(
                         builder: (context, provider, child) {
                       return TextFormField(
@@ -129,10 +150,11 @@ class _LoginPageState extends State<LoginPage> {
                               uname = _unamecontroller.text.toString().trim();
                               email = _emailcontroller.text.toString().trim();
                               password = _passcontroller.text.toString().trim();
+                              mobile = _mobileController.text.toString().trim();
                               widget.isLogin
                                   ? provider.login(context, email, password)
                                   : provider.signUp(
-                                      context, uname, email, password);
+                                      context, uname, email, password, mobile);
                             }
                           },
                           icon: provider.loading
@@ -150,6 +172,26 @@ class _LoginPageState extends State<LoginPage> {
                       );
                     }),
                     SizedBox(height: 20),
+                    widget.isLogin
+                        ? Container(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.purpleAccent,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30))),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              LoginWithPhone()));
+                                },
+                                icon: Icon(Icons.sms_outlined),
+                                label: Text("Login with Mobile no.")))
+                        : SizedBox(),
+                    SizedBox(height: 10),
                     TextButton(
                         onPressed: () {
                           setState(() {
@@ -157,6 +199,7 @@ class _LoginPageState extends State<LoginPage> {
                               _unamecontroller.clear();
                               _emailcontroller.clear();
                               _passcontroller.clear();
+                              _mobileController.clear();
                             }
                             widget.isLogin = !widget.isLogin;
                           });
