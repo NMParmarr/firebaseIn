@@ -4,6 +4,8 @@ import 'package:firebase_in/pages/auth_stream.dart';
 import 'package:firebase_in/pages/login_page.dart';
 import 'package:flutter/material.dart';
 
+import 'verify_phone.dart';
+
 class LoadingProvider extends ChangeNotifier {
   final _auth = FirebaseAuth.instance;
   bool loading = false;
@@ -58,7 +60,8 @@ class LoginProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> signUp(BuildContext context, uname, email, password, mobile) async {
+  Future<void> signUp(
+      BuildContext context, uname, email, password, mobile) async {
     bool navigate = true;
 
     loading = true;
@@ -85,7 +88,7 @@ class LoginProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> addUser(uname, email, password,mobile) async {
+  Future<void> addUser(uname, email, password, mobile) async {
     try {
       FirebaseFirestore _firestore = FirebaseFirestore.instance;
       CollectionReference users = _firestore.collection("users");
@@ -95,7 +98,7 @@ class LoginProvider extends ChangeNotifier {
           "email": email,
           "password": password,
           "username": uname,
-          "mobile" :mobile
+          "mobile": mobile
         },
       ).then((value) {
         LoginPage().isLogin = !LoginPage().isLogin;
@@ -113,6 +116,84 @@ class PasswordVisibilityProvider extends ChangeNotifier {
 
   void toggleVisibility() {
     isPasswordVisible = !isPasswordVisible;
+    notifyListeners();
+  }
+}
+
+/////////////////////////////////==login with phone==//////////////////////////////
+///==========================================================================//////
+class LoginWithPhoneProvider extends ChangeNotifier {
+  bool loading = false;
+  final _auth = FirebaseAuth.instance;
+
+  Future<void> login(BuildContext context, String phoneNo) async {
+    loading = true;
+    notifyListeners();
+    String code = '+91';
+    String phoneNumber = code + phoneNo;
+    _auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (_) {
+        loading = false;
+        notifyListeners();
+      },
+      verificationFailed: (e) {
+        print("VerificationFailed : " + e.toString());
+        loading = false;
+        notifyListeners();
+      },
+      codeSent: (String verificationId, int? Token) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: ((context) => VerifyPhone(
+                      verificationId: verificationId,
+                      phoneNo: phoneNo,
+                    ))));
+        loading = false;
+        notifyListeners();
+      },
+      codeAutoRetrievalTimeout: (e) {
+        print("codeAutoRetrievalTimeout" + e.toString());
+        loading = false;
+        notifyListeners();
+      },
+    );
+  }
+
+  Future<void> verify(context, verificationId, sms, phoneNo) async {
+    loading = true;
+    notifyListeners();
+    final credential = PhoneAuthProvider.credential(
+        verificationId: verificationId, smsCode: sms);
+    try {
+      await _auth.signInWithCredential(credential);
+      addUser( phoneNo).whenComplete(() {}).whenComplete(() {
+        loading = false;
+        notifyListeners();
+      });
+
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => AuthStream()));
+    } catch (e) {
+      loading = false;
+      notifyListeners();
+      print(e.toString());
+    }
+    notifyListeners();
+  }
+
+  Future<void> addUser( phoneNo) async {
+    FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    CollectionReference _users = _firestore.collection("phone_users");
+    final uid = _auth.currentUser!.uid;
+    try {
+      await _users.doc(uid).set({
+        "mobile": phoneNo,
+      });
+    } catch (e) {
+      print(e.toString());
+    }
     notifyListeners();
   }
 }

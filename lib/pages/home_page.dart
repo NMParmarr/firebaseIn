@@ -44,8 +44,8 @@ class _HomePageState extends State<HomePage> {
       future: users.doc(getUserId()).get(),
       builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          Map<String, dynamic> data =
-              snapshot.data!.data() as Map<String, dynamic>;
+          Map<String, dynamic> data = {'username':'nayan','mobile':'90909090'};
+              // snapshot.data!.data() as Map<String, dynamic>;
           return WillPopScope(
             onWillPop: () async {
               return FirebaseAuth.instance.currentUser != null;

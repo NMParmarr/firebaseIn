@@ -177,6 +177,7 @@ class _LoginPageState extends State<LoginPage> {
                             width: double.infinity,
                             child: ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.all(15),
                                     backgroundColor: Colors.purpleAccent,
                                     shape: RoundedRectangleBorder(
                                         borderRadius:

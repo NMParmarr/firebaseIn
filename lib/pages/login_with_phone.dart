@@ -1,11 +1,23 @@
-import 'package:firebase_in/pages/verify_phone.dart';
-import 'package:flutter/material.dart';
+// ignore_for_file: must_be_immutable
 
-class LoginWithPhone extends StatelessWidget {
+import 'package:firebase_in/pages/provider_widget.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+@immutable
+class LoginWithPhone extends StatefulWidget {
   LoginWithPhone({super.key});
 
+  @override
+  State<LoginWithPhone> createState() => _LoginWithPhoneState();
+}
+
+class _LoginWithPhoneState extends State<LoginWithPhone> {
   final _formKey = GlobalKey<FormState>();
+
   final _phoneController = TextEditingController();
+
+  String phoneNo = '';
 
   @override
   Widget build(BuildContext context) {
@@ -59,23 +71,28 @@ class LoginWithPhone extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 60),
-                Container(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: ((context) => VerifyPhone())));
-                      }
-                    },
-                    icon: Icon(Icons.message_sharp),
-                    label: Text("Send Code"),
-                    style:
-                        ElevatedButton.styleFrom(padding: EdgeInsets.all(15)),
-                  ),
-                )
+                Consumer<LoginWithPhoneProvider>(
+                    builder: (context, provider, child) {
+                  return Container(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          phoneNo = _phoneController.text.toString().trim();
+                          provider.login(context, phoneNo);
+                        }
+                      },
+                      icon: provider.loading
+                          ? SizedBox()
+                          : Icon(Icons.message_sharp),
+                      label: provider.loading
+                          ? CircularProgressIndicator(color: Colors.white)
+                          : Text("Send Code"),
+                      style:
+                          ElevatedButton.styleFrom(padding: EdgeInsets.all(15)),
+                    ),
+                  );
+                })
               ]),
             ),
           ),
