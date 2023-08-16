@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     SizedBox.shrink(),
                     Container(
-                      height: 300,
+                      height: 280,
                       width: double.infinity,
                       decoration: BoxDecoration(
                           image: DecorationImage(
@@ -95,7 +95,7 @@ class _LoginPageState extends State<LoginPage> {
                           border: UnderlineInputBorder(
                               borderRadius: BorderRadius.circular(3))),
                     ),
-                    SizedBox(height: 20),
+                    widget.isLogin ? SizedBox() : SizedBox(height: 20),
                     widget.isLogin
                         ? SizedBox()
                         : TextFormField(
@@ -171,6 +171,22 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       );
                     }),
+                    SizedBox(height: 7),
+                    TextButton(
+                        onPressed: () {
+                          setState(() {
+                            if (widget.isLogin) {
+                              _unamecontroller.clear();
+                              _emailcontroller.clear();
+                              _passcontroller.clear();
+                              _mobileController.clear();
+                            }
+                            widget.isLogin = !widget.isLogin;
+                          });
+                        },
+                        child: Text(widget.isLogin
+                            ? "Dont have an account? Sign Up"
+                            : "Already have an account? Login")),
                     SizedBox(height: 20),
                     widget.isLogin
                         ? Container(
@@ -192,22 +208,26 @@ class _LoginPageState extends State<LoginPage> {
                                 icon: Icon(Icons.sms_outlined),
                                 label: Text("Login with Mobile no.")))
                         : SizedBox(),
-                    SizedBox(height: 10),
-                    TextButton(
-                        onPressed: () {
-                          setState(() {
-                            if (widget.isLogin) {
-                              _unamecontroller.clear();
-                              _emailcontroller.clear();
-                              _passcontroller.clear();
-                              _mobileController.clear();
-                            }
-                            widget.isLogin = !widget.isLogin;
-                          });
-                        },
-                        child: Text(widget.isLogin
-                            ? "Dont have an account? Sign Up"
-                            : "Already have an account? Login"))
+                    SizedBox(height: 20),
+                    widget.isLogin
+                        ? Consumer<GoogleSignInProvider>(
+                            builder: (context, provider, child) {
+                            return Container(
+                                width: double.infinity,
+                                child: ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                        padding: EdgeInsets.all(15),
+                                        backgroundColor:
+                                            Color.fromARGB(255, 255, 191, 106),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(30))),
+                                    onPressed: () => provider.googleSignIn(context),
+                                    icon:
+                                        Icon(Icons.arrow_circle_right_outlined),
+                                    label: Text("Login with Google")));
+                          })
+                        : SizedBox(),
                   ],
                 ),
               ),

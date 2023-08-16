@@ -3,16 +3,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_in/pages/auth_stream.dart';
 import 'package:firebase_in/pages/login_page.dart';
 import 'package:flutter/material.dart';
-
+import 'package:google_sign_in/google_sign_in.dart';
 import 'verify_phone.dart';
 
 class LoadingProvider extends ChangeNotifier {
   final _auth = FirebaseAuth.instance;
   bool loading = false;
-  void signOut(BuildContext context) {
+  void signOut(BuildContext context, bool isGoogleSignIn) {
     loading = true;
     notifyListeners();
     try {
+      if (isGoogleSignIn) {
+        GoogleSignIn().signOut();
+      }
       _auth.signOut().whenComplete(() {
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: ((context) => AuthStream())));
@@ -168,7 +171,7 @@ class LoginWithPhoneProvider extends ChangeNotifier {
         verificationId: verificationId, smsCode: sms);
     try {
       await _auth.signInWithCredential(credential);
-      addUser( phoneNo).whenComplete(() {}).whenComplete(() {
+      addUser(phoneNo).whenComplete(() {}).whenComplete(() {
         loading = false;
         notifyListeners();
       });
@@ -183,9 +186,9 @@ class LoginWithPhoneProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addUser( phoneNo) async {
+  Future<void> addUser(phoneNo) async {
     FirebaseFirestore _firestore = FirebaseFirestore.instance;
-    CollectionReference _users = _firestore.collection("phone_users");
+    CollectionReference _users = _firestore.collection("users");
     final uid = _auth.currentUser!.uid;
     try {
       await _users.doc(uid).set({
@@ -195,5 +198,49 @@ class LoginWithPhoneProvider extends ChangeNotifier {
       print(e.toString());
     }
     notifyListeners();
+  }
+}
+
+/////////////////////google sign in ====================
+class GoogleSignInProvider extends ChangeNotifier {
+  final _auth = FirebaseAuth.instance;
+  Future<void> googleSignIn(context) async {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                )));
+    try {
+      GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      GoogleSignInAuthentication? googleAuth = await googleUser!.authentication;
+      AuthCredential credential = await GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      final userCredential = await _auth.signInWithCredential(credential);
+      addUser(userCredential, context);
+    } catch (e) {
+      print("GoogleSignInERROR : " + e.toString());
+    }
+  }
+
+  Future<void> addUser(
+      UserCredential userCredential, BuildContext context) async {
+    try {
+      final _firestore = await FirebaseFirestore.instance;
+      final _users = await _firestore.collection("users");
+      final uid = await _auth.currentUser!.uid;
+      await _users.doc(uid).set({
+        "username": userCredential.user!.displayName,
+        "mobile": userCredential.user!.phoneNumber,
+        "email": userCredential.user!.email,
+        "img": userCredential.user!.photoURL,
+        "isGoogleSignin": true
+      }).whenComplete(() => Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => AuthStream())));
+    } catch (e) {
+      print("AddUserERROR: " + e.toString());
+    }
   }
 }

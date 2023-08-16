@@ -48,7 +48,7 @@ class _LoginWithPhoneState extends State<LoginWithPhone> {
                   validator: (value) {
                     if (value!.isEmpty)
                       return "Enter mobile number..";
-                    else if (value.length > 10 || value.length < 0)
+                    else if (value.length != 10)
                       return "Enter valid mobile number..";
                     else
                       return null;

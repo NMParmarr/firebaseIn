@@ -10,6 +10,8 @@ void main() async {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider<LoadingProvider>(create: (_) => LoadingProvider()),
     ChangeNotifierProvider<LoginProvider>(create: (_) => LoginProvider()),
+    ChangeNotifierProvider<GoogleSignInProvider>(
+        create: (_) => GoogleSignInProvider()),
     ChangeNotifierProvider<LoginWithPhoneProvider>(
         create: (_) => LoginWithPhoneProvider()),
     ChangeNotifierProvider<PasswordVisibilityProvider>(

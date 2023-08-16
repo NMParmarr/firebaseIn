@@ -44,8 +44,12 @@ class _HomePageState extends State<HomePage> {
       future: users.doc(getUserId()).get(),
       builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          Map<String, dynamic> data = {'username':'nayan','mobile':'90909090'};
-              // snapshot.data!.data() as Map<String, dynamic>;
+          Map<String, dynamic> data =
+              snapshot.data!.data() as Map<String, dynamic>;
+
+          String img = data['img'] ??
+              'https://w7.pngwing.com/pngs/81/570/png-transparent-profile-logo-computer-icons-user-user-blue-heroes-logo-thumbnail.png';
+          bool isGoogleSignin = data['isGoogleSignin'] ?? false;
           return WillPopScope(
             onWillPop: () async {
               return FirebaseAuth.instance.currentUser != null;
@@ -57,6 +61,19 @@ class _HomePageState extends State<HomePage> {
                   title: Text("User Profile : ${data['username']}"),
                   centerTitle: true,
                   automaticallyImplyLeading: false,
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: CircleAvatar(
+                        child: ClipOval(
+                            child: Image.network(
+                          img,
+                        )),
+                        backgroundColor: Colors.teal,
+                        radius: 18,
+                      ),
+                    ),
+                  ],
                 ),
                 body: Center(
                   child: Column(
@@ -65,7 +82,10 @@ class _HomePageState extends State<HomePage> {
                       Text('Welcome : ${data['username']}'),
                       Text("Mobile : ${data['mobile']}"),
                       ElevatedButton(
-                        onPressed: () => provider.signOut(context),
+                        onPressed: () => provider.signOut(
+                          context,
+                          isGoogleSignin,
+                        ),
                         child: provider.loading
                             ? CircularProgressIndicator(
                                 color: const Color.fromARGB(255, 0, 0, 0),
